@@ -6,9 +6,18 @@ This node package will help development with:
  - [ ] authenticate to a cozy
  - [ ] create a device on cozy
  - [ ] remove a device on cozy
- - [ ] create a filter for couch replication
- - [ ] update a filter for couch replication
- - [ ] remove a filter for couch replication
+ - [X] create or update a filter for couch replication/change
+ - [ ] remove a filter
+
+
+Commands
+--------
+
+* `npm install`: install dependencies
+* `npm run build`: compile library on cozy-device-sdk.js
+* `npm run lint`: launch coffeelint on all coffee source files
+* `npm run test`: launch unit test with `mocha`
+
 
 License
 -------
