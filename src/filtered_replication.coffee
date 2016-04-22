@@ -1,4 +1,4 @@
-request = require 'request-json-light'
+request = require 'superagent'
 log     = require('printit')
     prefix: 'filteredReplication'
 
@@ -62,45 +62,50 @@ module.exports =
                 or config.notification
             return callback new Error "What do you want to synchronize?"
 
-        doc = @generateDesignDoc deviceName, config
-
-        client = request.newClient cozyUrl
-        client.setBasicAuth deviceName, devicePassword
-        client.put "/ds-api/filters/config", doc, (err, res, body) ->
+        client = request
+            .put "#{cozyUrl}/ds-api/filters/config"
+            .auth deviceName, devicePassword
+            .send @generateDesignDoc deviceName, config
+        client.end (err, res) ->
             if err
                 callback err
             else if not res?.statusCode in [200, 201]
-                message = body.error or "invalid statusCode #{res?.statusCode}"
+                message = res.body.error or
+                    "invalid statusCode #{res?.statusCode}"
                 callback new Error(message)
             else
-                callback null, body
+                callback null, res.body
 
 
     getDesignDoc: (cozyUrl, deviceName, devicePassword, callback) ->
         log.debug "getDesignDoc #{cozyUrl}, #{deviceName}"
 
-        client = request.newClient cozyUrl
-        client.setBasicAuth deviceName, devicePassword
-        client.get "/ds-api/filters/config", (err, res, body) ->
+        client = request
+            .get "#{cozyUrl}/ds-api/filters/config"
+            .auth deviceName, devicePassword
+        client.end (err, res) ->
             if err
                 callback err
             else if res?.statusCode isnt 200
-                message = body.error or "invalid statusCode #{res?.statusCode}"
+                message = res.body.error or
+                    "invalid statusCode #{res?.statusCode}"
                 callback new Error(message)
             else
-                callback null, body
+                callback null, res.body
 
 
     removeDesignDoc: (cozyUrl, deviceName, devicePassword, callback) ->
         log.debug "removeDesignDoc #{cozyUrl}, #{deviceName}"
 
-        client = request.newClient cozyUrl
-        client.setBasicAuth deviceName, devicePassword
-        client.del "/ds-api/filters/config", (err, res, body) ->
+        client = request
+            .del "#{cozyUrl}/ds-api/filters/config"
+            .auth deviceName, devicePassword
+        client.end (err, res) ->
             if err
                 callback err
             else if not res?.statusCode in [200, 204]
-                message = body.error or "invalid statusCode #{res?.statusCode}"
+                message = res.body.error or
+                    "invalid statusCode #{res?.statusCode}"
                 callback new Error(message)
             else
-                callback null, body
+                callback null, res.body

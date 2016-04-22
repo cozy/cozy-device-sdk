@@ -1,6 +1,6 @@
 {
   "name": "cozy-device-sdk",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "Help development to create a device on Cozy",
   "author": "Cozy Cloud <contact@cozycloud.cc> (https://cozycloud.cc/)",
   "license": "MIT",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "printit": "0.1.19",
-    "request-json-light": "0.5.22"
+    "superagent": "1.8.3"
   },
   "devDependencies": {
     "coffee-jshint": "0.2.3",

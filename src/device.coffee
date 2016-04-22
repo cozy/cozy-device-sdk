@@ -1,4 +1,4 @@
-request = require 'request-json-light'
+request = require 'superagent'
 log     = require('printit')
     prefix: 'device'
 
@@ -10,8 +10,8 @@ module.exports = Device =
     pingCozy: (cozyUrl, callback) ->
         log.debug "pingCozy #{cozyUrl}"
 
-        client = request.newClient cozyUrl
-        client.get "status", (err, res, body) ->
+        client = request.get "#{cozyUrl}/status"
+        client.end (err, res) ->
             if res?.statusCode isnt 200
                 callback new Error "No cozy at this URL"
             else
@@ -22,14 +22,16 @@ module.exports = Device =
     checkCredentials: (cozyUrl, cozyPassword, callback) ->
         log.debug "checkCredentials #{cozyUrl}"
 
-        client = request.newClient cozyUrl
         data =
             login: 'owner'
             password: cozyPassword
 
-        client.post "login", data, (err, res, body) ->
+        client = request
+            .post "#{cozyUrl}/login"
+            .send data
+        client.end (err, res) ->
             if res?.statusCode isnt 200
-                err = err?.message or body.error or body.message
+                err = err?.message or res.body.error or res.body.message
             callback err
 
 
@@ -38,19 +40,20 @@ module.exports = Device =
     registerDevice: (cozyUrl, deviceName, cozyPassword, callback) ->
         log.debug "registerDevice #{cozyUrl}, #{deviceName}"
 
-        client = request.newClient cozyUrl
-        client.setBasicAuth 'owner', cozyPassword
-
-        client.post 'device/', {login: deviceName}, (err, res, body) ->
+        client = request
+            .post "#{cozyUrl}/device"
+            .auth 'owner', cozyPassword
+            .send {login: deviceName}
+        client.end (err, res) ->
             if err
                 callback err
-            else if body.error?
-                callback body.error
+            else if res.body.error?
+                callback res.body.error
             else
                 callback null,
-                    id: body.id
+                    id: res.body.id
                     deviceName: deviceName
-                    password: body.password
+                    password: res.body.password
 
 
     # Same as registerDevice, but it will try again of the device name is
@@ -76,16 +79,16 @@ module.exports = Device =
     unregisterDevice: (cozyUrl, deviceName, devicePassword, callback) ->
         log.debug "unregisterDevice #{cozyUrl}, #{deviceName}"
 
-        client = request.newClient cozyUrl
-        client.setBasicAuth deviceName, devicePassword
-
-        client.del "device/#{deviceName}/", (err, res, body) ->
+        client = request
+            .del "#{cozyUrl}/device/#{deviceName}"
+            .auth deviceName, devicePassword
+        client.end (err, res) ->
             if res.statusCode in [200, 204]
                 callback null
             else if err
                 callback err
-            else if body.error?
-                callback new Error body.error
+            else if res.body.error?
+                callback new Error res.body.error
             else
                 callback new Error "Something went wrong (#{res.statusCode})"
 
@@ -95,13 +98,13 @@ module.exports = Device =
     getDiskSpace: (cozyUrl, login, password, callback) ->
         log.debug "getDiskSpace #{cozyUrl}, #{login}"
 
-        client = request.newClient cozyUrl
-        client.setBasicAuth login, password
-
-        client.get "disk-space", (err, res, body) ->
+        client = request
+            .get "#{cozyUrl}/disk-space"
+            .auth login, password
+        client.end (err, res) ->
             if err
                 callback err
-            else if body.error
-                callback new Error body.error
+            else if res.body.error
+                callback new Error res.body.error
             else
-                callback null, body
+                callback null, res.body
