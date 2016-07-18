@@ -92,10 +92,10 @@ module.exports = Device =
         client.setBasicAuth deviceName, devicePassword
 
         client.del "device/#{deviceName}/", (err, res, body) ->
-            if res.statusCode in [200, 204]
-                callback null
-            else if err
+            if err
                 callback err
+            else if res.statusCode in [200, 204]
+                callback null
             else if body.error?
                 callback new Error body.error
             else
