@@ -27,7 +27,7 @@
     "request-json-light": "0.5.25"
   },
   "devDependencies": {
-    "coffee-jshint": "0.2.3",
+    "coffee-jshint": "0.2.4",
     "coffee-script": "1.10.0",
     "coffeelint": "1.15.7",
     "mocha": "3.0.0",
