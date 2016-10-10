@@ -30,7 +30,7 @@
     "coffee-jshint": "0.2.5",
     "coffee-script": "1.11.0",
     "coffeelint": "1.16.0",
-    "mocha": "3.1.0",
+    "mocha": "3.1.1",
     "should": "11.1.1",
     "sinon": "1.17.6"
   }
